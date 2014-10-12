@@ -23,7 +23,7 @@ lcp = pysais.lcp(sequence, sa)
 for off in sa :
     print '%3d : %s' % (off, sequence[off:])
 
-array = np.array([0, 2, 3, 1], dtype = np.int32)
+array = np.array([2, 3, 1, 0], dtype = np.int32)
 sa_int = pysais.sais_int(array, 4)
 lcp_int = pysais.lcp_int(array, sa_int)
 ```
