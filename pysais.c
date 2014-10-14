@@ -344,7 +344,7 @@ PyObject *python_bisect(PyObject *self, PyObject *args)
     return Py_BuildValue("iO", index, found ? Py_True : Py_False);
 }
 
-PyObject *python_count_occurences(PyObject *self, PyObject *args)
+PyObject *python_count_occurrences(PyObject *self, PyObject *args)
 {
     PyArrayObject *SA_np, *LCP_np, *LCP_left_np, *LCP_right_np, *assignment_np; 
     int *SA, *LCP, *LCP_left, *LCP_right, *assignment;
@@ -400,7 +400,7 @@ static PyMethodDef ModuleMethods[] = {
     {"sais_int",  python_sais_int, METH_VARARGS, "Construct a Suffix Array for a given NumPy integer array."},
     {"lcp_int",  python_lcp_int, METH_VARARGS, "Construct the corresponding LCP array given a NumPy integer array and its SA."},
     {"bisect",  python_bisect, METH_VARARGS, "Query the SA using bisection. Inputs are Text, Pattern, SA, LCP_left, LCP_right."},
-    {"count_occurences",  python_count_occurences, METH_VARARGS, "A quick and dirty ad-hoc occurrence counting code."},
+    {"count_occurrences",  python_count_occurrences, METH_VARARGS, "A quick and dirty ad-hoc occurrence counting code."},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
