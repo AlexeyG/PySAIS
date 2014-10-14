@@ -383,7 +383,10 @@ PyObject *python_count_occurrences(PyObject *self, PyObject *args)
     {
         counts = (char *)counts_np->data;
         str_length++;
-        while (i < n && LCP[i] >= m)
+        k = SA[i++];
+        j = (k % str_length) % 3;
+        (*(counts + 3 * assignment[k] + j))++;
+        while (i < n && LCP[i - 1] >= m)
         {
             k = SA[i];
             j = (k % str_length) % 3;
