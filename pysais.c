@@ -64,11 +64,17 @@ static PyObject *python_sais_int(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "O!i", &PyArray_Type, &T_np, &k))
         return NULL;
     if (T_np == NULL)
+    {
+        PyErr_SetString(PyExc_StopIteration, "T cannot be None.");
         return NULL;
+    }
     if (not_intvector(T_np))
         return NULL;
     if (k <= 0)
+    {
+        PyErr_SetString(PyExc_StopIteration, "Alphabet size k must be greater than 0.");
         return NULL;
+    }
     T = pyvector_to_Carrayptrs(T_np);
     int n = T_np->dimensions[0];
     for (i = 0; i < n; i++)
@@ -97,7 +103,6 @@ static int __lcp_left_right(int *LCP, int *LCP_left, int *LCP_right, int left, i
     int middle = (left + right) / 2;
     LCP_left[middle - 1] = __lcp_left_right(LCP, LCP_left, LCP_right, left, middle);
     LCP_right[middle - 1] = __lcp_left_right(LCP, LCP_left, LCP_right, middle, right);
-    //printf("(%d, %d, %d) : %d\n", left, middle, right, MIN(LCP_left[middle - 1], LCP_right[middle - 1]));
     return MIN(LCP_left[middle - 1], LCP_right[middle - 1]);
 }
 
@@ -114,7 +119,6 @@ static int __bisect_sa(const unsigned char *T, const unsigned char *P, int *SA, 
     while (1)
     {
         middle = (left + right) / 2;
-        //printf("(%d, %d, %d)\n", left, middle, right);
         is_pattern_less = 1;
         solved = 0;
         i = MAX(lcp_l, lcp_r);
@@ -162,7 +166,6 @@ static int __bisect_sa(const unsigned char *T, const unsigned char *P, int *SA, 
                 i++;
             }
         }
-        //printf("is_pattern_less = %d, i = %d, solved = %d \n", is_pattern_less, i, solved);
 
         if (is_pattern_less)
         {
@@ -196,14 +199,25 @@ static PyObject *python_lcp(PyObject *self, PyObject *args)
     const unsigned char *T;
     if (!PyArg_ParseTuple(args, "sO!", &T, &PyArray_Type, &SA_np))
         return NULL;
-    if (SA_np == NULL)
+    if (T == NULL)
+    {
+        PyErr_SetString(PyExc_StopIteration, "T cannot be None.");
         return NULL;
+    }
+    if (SA_np == NULL)
+    {
+        PyErr_SetString(PyExc_StopIteration, "SA cannot be None.");
+        return NULL;
+    }
     if (not_intvector(SA_np))
         return NULL;
     SA = pyvector_to_Carrayptrs(SA_np);
     int n = SA_np->dimensions[0];
     if (n != strlen((const char *)T))
+    {
+        PyErr_SetString(PyExc_StopIteration, "SA and T do not match.");
         return NULL;
+    }
     int i;
     for (i = 0; i < n; i++)
         if (SA[i] < 0 || SA[i] >= n)
@@ -294,7 +308,7 @@ static PyObject *python_lcp_int(PyObject *self, PyObject *args)
     LCP_right_np = (PyArrayObject *) PyArray_FromDims(1, dims, NPY_INT);
     LCP_right = pyvector_to_Carrayptrs(LCP_right_np);
     int *rank = malloc(n * sizeof(int));
-    if (LCP == NULL || rank == NULL)
+    if (rank == NULL)
     {
         PyErr_SetString(PyExc_StopIteration, "Unable to allocate memory.");
         return NULL;
@@ -329,11 +343,25 @@ PyObject *python_bisect(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "ssO!O!O!", &T, &P, &PyArray_Type, &SA_np, &PyArray_Type, &LCP_left_np, &PyArray_Type, &LCP_right_np))
         return NULL;
     if (SA_np == NULL)
+    {
+        PyErr_SetString(PyExc_StopIteration, "SA cannot be None.");
         return NULL;
+    }
+    if (T == NULL)
+    {
+        PyErr_SetString(PyExc_StopIteration, "T cannot be None.");
+        return NULL;
+    }
     if (LCP_left_np == NULL)
+    {
+        PyErr_SetString(PyExc_StopIteration, "LCP_LM cannot be None.");
         return NULL;
+    }
     if (LCP_right_np == NULL)
+    {
+        PyErr_SetString(PyExc_StopIteration, "LCP_MR cannot be None.");
         return NULL;
+    }
     SA = pyvector_to_Carrayptrs(SA_np);
     LCP_left = pyvector_to_Carrayptrs(LCP_left_np);
     LCP_right = pyvector_to_Carrayptrs(LCP_right_np);
@@ -398,11 +426,11 @@ PyObject *python_count_occurrences(PyObject *self, PyObject *args)
 }
 
 static PyMethodDef ModuleMethods[] = {
-    {"sais",  python_sais, METH_VARARGS, "Construct a Suffix Array for a given string."},
-    {"lcp",  python_lcp, METH_VARARGS, "Construct the corresponding LCP array given a string and its SA."},
-    {"sais_int",  python_sais_int, METH_VARARGS, "Construct a Suffix Array for a given NumPy integer array."},
-    {"lcp_int",  python_lcp_int, METH_VARARGS, "Construct the corresponding LCP array given a NumPy integer array and its SA."},
-    {"bisect",  python_bisect, METH_VARARGS, "Query the SA using bisection. Inputs are Text, Pattern, SA, LCP_left, LCP_right."},
+    {"sais",  python_sais, METH_VARARGS, "Construct a Suffix Array for a given string.\n:param string T : character string for which SA should be constructed.\n:returns ndarray SA : constructed suffix array."},
+    {"lcp",  python_lcp, METH_VARARGS, "Construct the corresponding LCP array given a string and its SA.\n:param string T : character string for which the SA was constructed.\n:param ndarray SA : suffix array for T.\n:returns ndarray LCP : LCP1 array (for S_i, S_{i+1}).\nreturns ndarray LCP_LM : LCP LM array for binary search.\nreturns ndarray LCP_MR : LCP_MR array for binary search. "},
+    {"sais_int",  python_sais_int, METH_VARARGS, "Construct a Suffix Array for a given NumPy integer array.\n:param ndarray T : int array for which SA should be constructed.\n:param k : alphabet size. All integers in T must be >= 0 and < k.\n:return ndarray SA : suffix array for T."},
+    {"lcp_int",  python_lcp_int, METH_VARARGS, "Construct the corresponding LCP array given a NumPy integer array and its SA.\n:param ndarary T : int array for which the SA was constructed.\n:param ndarray SA : suffix array for T.\n:returns ndarray LCP : LCP1 array (for S_i, S_{i+1}).\nreturns ndarray LCP_LM : LCP LM array for binary search.\nreturns ndarray LCP_MR : LCP_MR array for binary search."},
+    {"bisect",  python_bisect, METH_VARARGS, "Query the SA using bisection. Inputs are Text, Pattern, SA, LCP_left, LCP_right.\n:param string T : character string for which the SA was constructed.\n:param string P : pattern that is queried.\n:param ndarray LCP_LM : LCP_LM array.\n:param ndarray LCP_MR : LCP_MR array.\nreturns int index : SA index where the pattern was found.\nreturns bool flag : a flag that is set to True if the pattern was found."},
     {"count_occurrences",  python_count_occurrences, METH_VARARGS, "A quick and dirty ad-hoc occurrence counting code."},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
