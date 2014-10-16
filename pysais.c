@@ -381,15 +381,30 @@ PyObject *python_count_occurrences(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "ssO!O!O!O!O!ii", &T, &P, &PyArray_Type, &assignment_np, &PyArray_Type, &SA_np, &PyArray_Type, &LCP_np, &PyArray_Type, &LCP_left_np, &PyArray_Type, &LCP_right_np, &n_samples, &str_length))
         return NULL;
     if (assignment_np == NULL)
+    {
+        PyErr_SetString(PyExc_StopIteration, "Assignment array cannot be None.");
         return NULL;
+    }
     if (SA_np == NULL)
+    {
+        PyErr_SetString(PyExc_StopIteration, "SA cannot be None.");
         return NULL;
+    }
     if (LCP_np == NULL)
+    {
+        PyErr_SetString(PyExc_StopIteration, "LCP cannot be None.");
         return NULL;
+    }
     if (LCP_left_np == NULL)
+    {
+        PyErr_SetString(PyExc_StopIteration, "LCP_LM cannot be None.");
         return NULL;
+    }
     if (LCP_right_np == NULL)
+    {
+        PyErr_SetString(PyExc_StopIteration, "LCP_MR cannot be None.");
         return NULL;
+    }
     assignment = pyvector_to_Carrayptrs(assignment_np);
     SA = pyvector_to_Carrayptrs(SA_np);
     LCP = pyvector_to_Carrayptrs(LCP_np);
