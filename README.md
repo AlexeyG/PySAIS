@@ -18,12 +18,12 @@ import numpy as np
 
 sequence = 'mississippi$'
 sa = pysais.sais(sequence)
-lcp = pysais.lcp(sequence, sa)
+lcp, lcp_lm, lcp_mr = pysais.lcp(sequence, sa)
 
 for off in sa :
     print '%3d : %s' % (off, sequence[off:])
 
 array = np.array([2, 3, 1, 0], dtype = np.int32)
 sa_int = pysais.sais_int(array, 4)
-lcp_int = pysais.lcp_int(array, sa_int)
+lcp_int, lcp_lm_int, lcp_mr_int = pysais.lcp_int(array, sa_int)
 ```
