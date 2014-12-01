@@ -376,9 +376,10 @@ PyObject *python_count_occurrences(PyObject *self, PyObject *args)
 {
     PyArrayObject *SA_np, *LCP_np, *LCP_left_np, *LCP_right_np, *assignment_np; 
     int *SA, *LCP, *LCP_left, *LCP_right, *assignment;
+    int skip_start, skip_stop;
     const unsigned char *T, *P;
     int n_samples, str_length;
-    if (!PyArg_ParseTuple(args, "ssO!O!O!O!O!ii", &T, &P, &PyArray_Type, &assignment_np, &PyArray_Type, &SA_np, &PyArray_Type, &LCP_np, &PyArray_Type, &LCP_left_np, &PyArray_Type, &LCP_right_np, &n_samples, &str_length))
+    if (!PyArg_ParseTuple(args, "ssO!O!O!O!O!iiii", &T, &P, &PyArray_Type, &assignment_np, &PyArray_Type, &SA_np, &PyArray_Type, &LCP_np, &PyArray_Type, &LCP_left_np, &PyArray_Type, &LCP_right_np, &n_samples, &str_length, &skip_start, &skip_stop))
         return NULL;
     if (assignment_np == NULL)
     {
@@ -432,8 +433,12 @@ PyObject *python_count_occurrences(PyObject *self, PyObject *args)
         while (i < n && LCP[i - 1] >= m)
         {
             k = SA[i];
-            j = (k % str_length) % 3;
-            (*(counts + 3 * assignment[k] + j))++;
+            j = k % str_length;
+            if ((j + m <= skip_start) || (j >= skip_stop))
+            {
+                j = j % 3;
+                (*(counts + 3 * assignment[k] + j))++;
+            }
             i++;
         }
     }
@@ -515,7 +520,7 @@ static PyMethodDef ModuleMethods[] = {
     {"sais_int",  python_sais_int, METH_VARARGS, "Construct a Suffix Array for a given NumPy integer array.\n:param ndarray T : int array for which SA should be constructed.\n:param k : alphabet size. All integers in T must be >= 0 and < k.\n:return ndarray SA : suffix array for T."},
     {"lcp_int",  python_lcp_int, METH_VARARGS, "Construct the corresponding LCP array given a NumPy integer array and its SA.\n:param ndarary T : int array for which the SA was constructed.\n:param ndarray SA : suffix array for T.\n:returns ndarray LCP : LCP1 array (for S_i, S_{i+1}).\n:returns ndarray LCP_LM : LCP LM array for binary search.\n:returns ndarray LCP_MR : LCP_MR array for binary search."},
     {"bisect",  python_bisect, METH_VARARGS, "Query the SA using bisection. Inputs are Text, Pattern, SA, LCP_left, LCP_right.\n:param string T : character string for which the SA was constructed.\n:param string P : pattern that is queried.\n:param ndarray LCP_LM : LCP_LM array.\n:param ndarray LCP_MR : LCP_MR array.\n:returns int index : SA index where the pattern was found.\n:returns bool flag : a flag that is set to True if the pattern was found."},
-    {"count_occurrences",  python_count_occurrences, METH_VARARGS, "A project-specific occurrence counting method. Records the number of occurrences of a k-mer in each of the ORF (0, 1, 2) for a generalized suffix array consisting of DNA sequences of equal length.\n:param string T : string for which the generalized SA was constructed.\n:param string P : k-mer pattern that will be counted.\n:param ndarray assignment : an array of DNA sequences indices. Element at position i gives the id of the DNA that is at this location in T.\n:param ndarray LCP : LCP array.\n:param ndarray LCP_LM : LCP_LM arary.\n:param ndarray LCP_MR : LCP_MR array.\n:param int n_samples : number of DNA sequences in the generalized SA.\n:param int str_length : lengths of the DNA sequences in the SA.\n:returns ndarray counts : an n_samples x 3 array of motif occurrence counts per DNA sequence."},
+    {"count_occurrences",  python_count_occurrences, METH_VARARGS, "A project-specific occurrence counting method. Records the number of occurrences of a k-mer in each of the ORF (0, 1, 2) for a generalized suffix array consisting of DNA sequences of equal length.\n:param string T : string for which the generalized SA was constructed.\n:param string P : k-mer pattern that will be counted.\n:param ndarray assignment : an array of DNA sequences indices. Element at position i gives the id of the DNA that is at this location in T.\n:param ndarray LCP : LCP array.\n:param ndarray LCP_LM : LCP_LM arary.\n:param ndarray LCP_MR : LCP_MR array.\n:param int n_samples : number of DNA sequences in the generalized SA.\n:param int str_length : lengths of the DNA sequences in the SA.\n:param int skip_start : start index of the part of the string that should not be counted.\n:param int skip_stop : stop index of the part of the string that should not be counted.\n:returns ndarray counts : an n_samples x 3 array of motif occurrence counts per DNA sequence."},
     {"count_position_occurrences",  python_count_position_occurrences, METH_VARARGS, "A project-specific occurrence counting method. Records the number of occurrences of a k-mer in each possible offset (i.e. 0/1 counts) for a generalized suffix array consisting of DNA sequences of equal length.\n:param string T : string for which the generalized SA was constructed.\n:param string P : k-mer pattern that will be counted.\n:param ndarray assignment : an array of DNA sequences indices. Element at position i gives the id of the DNA that is at this location in T.\n:param ndarray LCP : LCP array.\n:param ndarray LCP_LM : LCP_LM arary.\n:param ndarray LCP_MR : LCP_MR array.\n:param int n_samples : number of DNA sequences in the generalized SA.\n:param int str_length : lengths of the DNA sequences in the SA.\n:returns ndarray counts : an n_samples x (str_length - len(P)) array of motif occurrence counts per DNA sequence."},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
