@@ -1,7 +1,5 @@
 #include <Python.h>
 #include "sais.h"
-#include "stdio.h"
-#include "stdlib.h"
 
 #include <string.h>
 #include "arrayobject.h"
