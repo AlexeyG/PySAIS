@@ -1,5 +1,7 @@
 #include <Python.h>
 #include "sais.h"
+#include "stdio.h"
+#include "stdlib.h"
 
 #include <string.h>
 #include "arrayobject.h"
@@ -428,15 +430,19 @@ PyObject *python_count_occurrences(PyObject *self, PyObject *args)
         counts = (char *)counts_np->data;
         str_length++;
         k = SA[i++];
-        j = (k % str_length) % 3;
-        (*(counts + 3 * assignment[k] + j))++;
+        j = k % str_length;
+        if ((j + m <= skip_start) || (j >= skip_stop))
+        {
+            j %= 3;
+            (*(counts + 3 * assignment[k] + j))++;
+        }
         while (i < n && LCP[i - 1] >= m)
         {
             k = SA[i];
             j = k % str_length;
             if ((j + m <= skip_start) || (j >= skip_stop))
             {
-                j = j % 3;
+                j %= 3;
                 (*(counts + 3 * assignment[k] + j))++;
             }
             i++;
