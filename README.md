@@ -1,7 +1,7 @@
 A Python C module wrapper for the [SA-IS algorithm implementation by Yuta Mori](https://sites.google.com/site/yuta256/sais).
 Additionally includes an implementation of [a linear LCP construction algirthm](http://www.cs.helsinki.fi/u/tpkarkka/opetus/11s/spa/lecture10.pdf).
 
-The idea to create a C module wrapper was inspyred by the [CTypes wrapper](https://github.com/davehughes/sais) from David Hughes.
+The idea to create a C module wrapper was inspired by the [CTypes wrapper](https://github.com/davehughes/sais) from David Hughes.
 
 Installation:
 ---------
