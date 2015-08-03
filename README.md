@@ -7,6 +7,7 @@ Installation:
 ---------
 ```
 ./setup.py build
+./setup.py test    # optional
 ./setup.py install
 ```
 
