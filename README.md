@@ -27,3 +27,7 @@ array = np.array([2, 3, 1, 0], dtype = np.int32)
 sa_int = pysais.sais_int(array, 4)
 lcp_int, lcp_lm_int, lcp_mr_int = pysais.lcp_int(array, sa_int)
 ```
+
+License:
+---------
+The code is available under the MIT license (see LICENSE file).
