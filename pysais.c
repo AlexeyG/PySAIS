@@ -47,9 +47,9 @@ static PyObject *python_sais(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "s", &T))
         return NULL;
     int n = strlen((const char *)T);
-    int dims[2];
+    npy_intp dims[2];
     dims[0] = n;
-    SA_np = (PyArrayObject *) PyArray_FromDims(1, dims, NPY_INT);
+    SA_np = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_INT);
     SA = pyvector_to_Carrayptrs(SA_np);
     int res = sais(T, SA, n);
     if (res < 0)
@@ -87,9 +87,9 @@ static PyObject *python_sais_int(PyObject *self, PyObject *args)
             PyErr_SetString(PyExc_StopIteration, "Array elements must be >= 0 and < k (alphabet size).");
             return NULL;
         }
-    int dims[2];
+    npy_intp dims[2];
     dims[0] = n;
-    SA_np = (PyArrayObject *) PyArray_FromDims(1, dims, NPY_INT);
+    SA_np = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_INT);
     SA = pyvector_to_Carrayptrs(SA_np);
     int res = sais_int(T, SA, n, k);
     if (res < 0)
@@ -229,14 +229,14 @@ static PyObject *python_lcp(PyObject *self, PyObject *args)
             PyErr_SetString(PyExc_StopIteration, "Incorrect SA given as input.");
             return NULL;
         }
-    int dims[2];
+    npy_intp dims[2];
     dims[0] = n;
-    LCP_np = (PyArrayObject *) PyArray_FromDims(1, dims, NPY_INT);
+    LCP_np = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_INT);
     LCP = pyvector_to_Carrayptrs(LCP_np);
     dims[0]--;
-    LCP_left_np = (PyArrayObject *) PyArray_FromDims(1, dims, NPY_INT);
+    LCP_left_np = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_INT);
     LCP_left = pyvector_to_Carrayptrs(LCP_left_np);
-    LCP_right_np = (PyArrayObject *) PyArray_FromDims(1, dims, NPY_INT);
+    LCP_right_np = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_INT);
     LCP_right = pyvector_to_Carrayptrs(LCP_right_np);
     int *rank = malloc(n * sizeof(int));
     if (rank == NULL)
@@ -419,12 +419,12 @@ PyObject *python_count_occurrences(PyObject *self, PyObject *args)
     char found;
     int i = __bisect_sa(T, P, SA, LCP_left, LCP_right, n, m, &found);
     
-    int dims[1];
+    npy_intp dims[1];
     dims[0] = n_samples;
     PyArrayObject *counts_np;
     char *counts;
     int k;
-    counts_np = (PyArrayObject *) PyArray_FromDims(1, dims, NPY_BYTE);
+    counts_np = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_BYTE);
     if (found)
     {
         counts = (char *)counts_np->data;
@@ -484,14 +484,14 @@ PyObject *python_count_position_occurrences(PyObject *self, PyObject *args)
     char found;
     int i = __bisect_sa(T, P, SA, LCP_left, LCP_right, n, m, &found);
     
-    int dims[2];
+    npy_intp dims[2];
     int array_size = str_length - m + 1;
     dims[0] = n_samples;
     dims[1] = array_size;
     PyArrayObject *counts_np;
     char *counts;
     int j, k;
-    counts_np = (PyArrayObject *) PyArray_FromDims(2, dims, NPY_BYTE);
+    counts_np = (PyArrayObject *) PyArray_SimpleNew(2, dims, NPY_BYTE);
     if (found)
     {
         counts = (char *)counts_np->data;
@@ -521,8 +521,29 @@ static PyMethodDef ModuleMethods[] = {
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
+
+#if PY_MAJOR_VERSION >= 3
+
+static struct PyModuleDef mod =
+{
+    PyModuleDef_HEAD_INIT,
+    "pysais",
+    "Suffix Array library using the SA-IS algorithm",
+    -1,
+    ModuleMethods
+};
+
+PyMODINIT_FUNC PyInit_pysais(void)
+{
+    import_array(); // NumPy
+    return PyModule_Create(&mod);
+}
+#else
+
 PyMODINIT_FUNC initpysais(void)
 {
     (void) Py_InitModule("pysais", ModuleMethods);
     import_array(); // NumPy
 }
+
+#endif
