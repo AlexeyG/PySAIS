@@ -382,7 +382,7 @@ PyObject *python_count_occurrences(PyObject *self, PyObject *args)
     int *SA, *LCP, *LCP_left, *LCP_right, *assignment;
     const unsigned char *T, *P;
     int n_samples, str_length;
-    if (!PyArg_ParseTuple(args, "ssO!O!O!O!O!iii", &T, &P, &PyArray_Type, &assignment_np, &PyArray_Type, &SA_np, &PyArray_Type, &LCP_np, &PyArray_Type, &LCP_left_np, &PyArray_Type, &LCP_right_np, &n_samples, &str_length))
+    if (!PyArg_ParseTuple(args, "ssO!O!O!O!O!ii", &T, &P, &PyArray_Type, &assignment_np, &PyArray_Type, &SA_np, &PyArray_Type, &LCP_np, &PyArray_Type, &LCP_left_np, &PyArray_Type, &LCP_right_np, &n_samples, &str_length))
         return NULL;
     if (assignment_np == NULL)
     {
