@@ -32,3 +32,7 @@ lcp_int, lcp_lm_int, lcp_mr_int = pysais.lcp_int(array, sa_int)
 License:
 ---------
 The code is available under the MIT license (see LICENSE file).
+
+Status:
+---------
+[![Build Status](https://travis-ci.org/AlexeyG/PySAIS.svg)](https://travis-ci.org/AlexeyG/PySAIS)
