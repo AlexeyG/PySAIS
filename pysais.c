@@ -49,7 +49,7 @@ static PyObject *python_sais(PyObject *self, PyObject *args)
     int n = strlen((const char *)T);
     npy_intp dims[2];
     dims[0] = n;
-    SA_np = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_INT);
+    SA_np = (PyArrayObject *) PyArray_ZEROS(1, dims, NPY_INT, 0);
     SA = pyvector_to_Carrayptrs(SA_np);
     int res = sais(T, SA, n);
     if (res < 0)
@@ -89,7 +89,7 @@ static PyObject *python_sais_int(PyObject *self, PyObject *args)
         }
     npy_intp dims[2];
     dims[0] = n;
-    SA_np = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_INT);
+    SA_np = (PyArrayObject *) PyArray_ZEROS(1, dims, NPY_INT, 0);
     SA = pyvector_to_Carrayptrs(SA_np);
     int res = sais_int(T, SA, n, k);
     if (res < 0)
@@ -231,12 +231,12 @@ static PyObject *python_lcp(PyObject *self, PyObject *args)
         }
     npy_intp dims[2];
     dims[0] = n;
-    LCP_np = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_INT);
+    LCP_np = (PyArrayObject *) PyArray_ZEROS(1, dims, NPY_INT, 0);
     LCP = pyvector_to_Carrayptrs(LCP_np);
     dims[0]--;
-    LCP_left_np = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_INT);
+    LCP_left_np = (PyArrayObject *) PyArray_ZEROS(1, dims, NPY_INT, 0);
     LCP_left = pyvector_to_Carrayptrs(LCP_left_np);
-    LCP_right_np = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_INT);
+    LCP_right_np = (PyArrayObject *) PyArray_ZEROS(1, dims, NPY_INT, 0);
     LCP_right = pyvector_to_Carrayptrs(LCP_right_np);
     int *rank = malloc(n * sizeof(int));
     if (rank == NULL)
@@ -424,7 +424,7 @@ PyObject *python_count_occurrences(PyObject *self, PyObject *args)
     PyArrayObject *counts_np;
     char *counts;
     int k;
-    counts_np = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_BYTE);
+    counts_np = (PyArrayObject *) PyArray_ZEROS(1, dims, NPY_BYTE, 0);
     if (found)
     {
         counts = (char *)counts_np->data;
@@ -491,7 +491,7 @@ PyObject *python_count_position_occurrences(PyObject *self, PyObject *args)
     PyArrayObject *counts_np;
     char *counts;
     int j, k;
-    counts_np = (PyArrayObject *) PyArray_SimpleNew(2, dims, NPY_BYTE);
+    counts_np = (PyArrayObject *) PyArray_ZEROS(2, dims, NPY_BYTE, 0);
     if (found)
     {
         counts = (char *)counts_np->data;
