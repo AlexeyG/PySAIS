@@ -287,7 +287,7 @@ static PyObject *python_lcp_int(PyObject *self, PyObject *args)
     if (not_intvector(T_np))
         return NULL;
     SA = pyvector_to_Carrayptrs(SA_np);
-    T = pyvector_to_Carrayptrs(SA_np);
+    T = pyvector_to_Carrayptrs(T_np);
     int n = SA_np->dimensions[0];
     int n_T = T_np->dimensions[0];
     if (n != n_T)
